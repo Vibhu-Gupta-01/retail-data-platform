@@ -1,0 +1,50 @@
+{
+	"name": "ds_sql_database_orders",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqlserver_retailmart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "order_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "customer_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "store_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "order_date",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "payment_mode",
+				"type": "varchar"
+			},
+			{
+				"name": "order_status",
+				"type": "varchar"
+			},
+			{
+				"name": "updated_at",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "orders"
+		}
+	}
+}
