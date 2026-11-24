@@ -16,7 +16,7 @@
 					"referenceName": "ls_keyvault_retail",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "sqlserver-adf-reader-password"
+				"secretName": "sqlp-adf-reader-password"
 			}
 		},
 		"connectVia": {
