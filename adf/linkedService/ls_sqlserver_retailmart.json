@@ -1,0 +1,27 @@
+{
+	"name": "ls_sqlserver_retailmart",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": ".\\SQLEXPRESS",
+			"database": "RetailMart",
+			"encrypt": "optional",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "adf_reader",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_keyvault_retail",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "sqlserver-adf-reader-password"
+			}
+		},
+		"connectVia": {
+			"referenceName": "shir-retail-local",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
