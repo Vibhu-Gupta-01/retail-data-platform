@@ -6,7 +6,7 @@
 		"typeProperties": {
 			"server": ".\\SQLEXPRESS",
 			"database": "RetailMart",
-			"encrypt": "optional",
+			"encrypt": "mandatory",
 			"trustServerCertificate": true,
 			"authenticationType": "SQL",
 			"userName": "adf_reader",
