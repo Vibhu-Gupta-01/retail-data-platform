@@ -7,6 +7,10 @@
 			"url": "https://fakestoreapi.com",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "shir-retail-local",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
