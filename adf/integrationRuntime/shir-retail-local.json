@@ -1,0 +1,6 @@
+{
+	"name": "shir-retail-local",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
