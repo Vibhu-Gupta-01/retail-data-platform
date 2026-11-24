@@ -1,0 +1,12 @@
+{
+	"name": "ls_rest_fakestore",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://fakestoreapi.com",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
