@@ -18,7 +18,7 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"tables": {
-							"value": "[{\"schema\":\"dbo\",\"table\":\"stores\"},{\"schema\":\"dbo\",\"table\":\"customers\"},{\"schema\":\"dbo\",\"table\":\"orders\"},{\"schema\":\"dbo\",\"table\":\"order_items\"}]",
+							"value": "@json('[{\"schema\":\"dbo\",\"table\":\"stores\"},{\"schema\":\"dbo\",\"table\":\"customers\"},{\"schema\":\"dbo\",\"table\":\"orders\"},{\"schema\":\"dbo\",\"table\":\"order_items\"}]')",
 							"type": "Expression"
 						}
 					}
