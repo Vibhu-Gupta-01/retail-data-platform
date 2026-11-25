@@ -1,0 +1,46 @@
+{
+	"name": "pl_master_ingest",
+	"properties": {
+		"activities": [
+			{
+				"name": "exec_sqlserver",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_ingest_sqlserver_retailmart",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"tables": {
+							"value": "@json('[{\"schema\":\"dbo\",\"table\":\"stores\"},{\"schema\":\"dbo\",\"table\":\"customers\"},{\"schema\":\"dbo\",\"table\":\"orders\"},{\"schema\":\"dbo\",\"table\":\"order_items\"}]')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "exec_fakestore_api",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_ingest_fakestore_api",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": []
+	}
+}

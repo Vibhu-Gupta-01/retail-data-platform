@@ -1,0 +1,116 @@
+{
+	"name": "pl_ingest_sqlserver_retailmart",
+	"properties": {
+		"activities": [
+			{
+				"name": "foreach_table",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.tables",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "copy_table_to_landing",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sqlserver_table",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema_name": {
+											"value": "@item().schema",
+											"type": "Expression"
+										},
+										"table_name": {
+											"value": "@item().table",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_parquet_landing",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder_path": {
+											"value": "@concat('sqlserver/',item().table,'/',\nformatDateTime(pipeline().TriggerTime,'yyyy/MM/dd')\n)",
+											"type": "Expression"
+										},
+										"file_name": {
+											"value": "@concat(item().table,'.parquet')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"tables": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"schema": "dbo",
+						"table": "stores"
+					},
+					{
+						"schema": "dbo",
+						"table": "customers"
+					},
+					{
+						"schema": "dbo",
+						"table": "orders"
+					},
+					{
+						"schema": "dbo",
+						"table": "order_items"
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
