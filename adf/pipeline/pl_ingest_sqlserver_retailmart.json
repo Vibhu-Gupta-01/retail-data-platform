@@ -73,7 +73,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folder_path": {
-											"value": "@concat('sqlserver/',item().table,'/',\nformatDateTime(pipeline().TriggerTime,'dd/MM/yyyy')\n)",
+											"value": "@concat('sqlserver/',item().table,'/',\nformatDateTime(pipeline().TriggerTime,'dd-MM-yyyy')\n)",
 											"type": "Expression"
 										},
 										"file_name": {
