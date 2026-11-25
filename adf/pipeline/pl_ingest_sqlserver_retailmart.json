@@ -90,7 +90,25 @@
 		],
 		"parameters": {
 			"tables": {
-				"type": "array"
+				"type": "array",
+				"defaultValue": [
+					{
+						"schema": "dbo",
+						"table": "stores"
+					},
+					{
+						"schema": "dbo",
+						"table": "customers"
+					},
+					{
+						"schema": "dbo",
+						"table": "orders"
+					},
+					{
+						"schema": "dbo",
+						"table": "order_items"
+					}
+				]
 			}
 		},
 		"annotations": []
