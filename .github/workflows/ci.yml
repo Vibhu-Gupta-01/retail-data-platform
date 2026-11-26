@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate ADF, notebooks and scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate ADF JSON files
+        run: |
+          python - <<'EOF'
+          import json, pathlib, sys
+          files = sorted(pathlib.Path("adf").rglob("*.json"))
+          bad = 0
+          for f in files:
+              try:
+                  json.loads(f.read_text(encoding="utf-8"))
+              except Exception as e:
+                  print("INVALID", f, e)
+                  bad += 1
+          print("Checked", len(files), "ADF files,", bad, "invalid")
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - name: Check every ADF pipeline has activities
+        run: |
+          python - <<'EOF'
+          import json, pathlib, sys
+          bad = 0
+          for f in sorted(pathlib.Path("adf/pipeline").glob("*.json")):
+              data = json.loads(f.read_text(encoding="utf-8"))
+              acts = data.get("properties", {}).get("activities", [])
+              if not acts:
+                  print("NO ACTIVITIES", f)
+                  bad += 1
+              else:
+                  print("OK", f.name, "-", len(acts), "activities")
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - name: Validate Databricks notebooks
+        run: |
+          python - <<'EOF'
+          import json, pathlib, sys
+          files = sorted(pathlib.Path("databricks/notebooks").glob("*.ipynb"))
+          bad = 0
+          for f in files:
+              try:
+                  nb = json.loads(f.read_text(encoding="utf-8"))
+                  assert isinstance(nb.get("cells"), list) and nb["cells"]
+              except Exception as e:
+                  print("INVALID NOTEBOOK", f, e)
+                  bad += 1
+          print("Checked", len(files), "notebooks,", bad, "invalid")
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - name: Compile Python scripts
+        run: |
+          find sources -name "*.py" -print0 | xargs -0 -r python -m py_compile
+          echo "Python scripts compiled"
+
+  secret-scan:
+    name: Scan for secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
