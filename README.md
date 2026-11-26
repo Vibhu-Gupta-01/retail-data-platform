@@ -1,5 +1,7 @@
 # Enterprise Retail Data Platform: Batch Pipeline on Azure
 
+![CI](https://github.com/Vibhu-Gupta-01/retail-data-platform/actions/workflows/ci.yml/badge.svg)
+
 An end-to-end batch data pipeline for a fictional retail chain, **RetailMart**. It pulls data from three different source systems, lands it in a data lake, cleans and models it with a Medallion architecture (Bronze, Silver, Gold), serves it through Synapse, and reports on it in Power BI.
 
 > The data is simulated. The stores, customers, orders and inventory were generated for this project, and some dirty data was seeded deliberately to test the data quality checks.
@@ -68,11 +70,11 @@ flowchart LR
 
     subgraph DevOps
         GH[GitHub<br/>version control]
-        AZ[Azure DevOps<br/>CI/CD]
+        GA[GitHub Actions<br/>CI checks]
     end
     GH -.-> D
     GH -.-> Databricks
-    GH -.-> AZ
+    GH -.-> GA
 ```
 
 ---
@@ -91,7 +93,7 @@ flowchart LR
 | **Delta Lake** | Table format for Bronze, Silver, Gold | Reliable tables, schema enforcement, easy reconciliation |
 | **Synapse Serverless SQL** | Serving layer | Pay per query with no dedicated pool to run and pay for. Views over Gold Parquet |
 | **Power BI** | Reporting | Standard BI tool, with a star schema model and DAX measures |
-| **GitHub + Azure DevOps** | Version control and CI/CD | ADF is connected to Git (feature branch, pull request, publish), the way teams actually work |
+| **GitHub + GitHub Actions** | Version control and CI | ADF is connected to Git (feature branch, pull request, publish), the way teams actually work. A CI workflow validates the ADF JSON, notebooks and scripts and scans for secrets on every pull request |
 
 ---
 
@@ -175,14 +177,27 @@ The report file is in [`powerbi/`](powerbi/).
 
 ```
 retail-data-platform/
+├── .github/workflows/    # CI: validation checks and secret scan
 ├── adf/                  # ADF pipelines, datasets, linked services (Git-integrated)
 ├── sources/              # Scripts that build the sources: SQL Server, CSV generator, API notes
 ├── databricks/
 │   └── notebooks/        # 00_verify_landing, 01_bronze_ingest, 02_silver_inventory,
 │                         # 03_profile_bronze, 03_silver_core, 04_gold_model, 05_gold_export
+├── docs/screenshots/     # Proof screenshots of the running pipeline
 ├── powerbi/              # .pbix file and dashboard screenshots
 └── README.md
 ```
+
+### CI
+
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every pull request and every push to `main`:
+
+- Validates all ADF JSON files and checks that every pipeline has activities
+- Validates the Databricks notebooks
+- Compiles the Python scripts
+- Scans the full Git history for secrets with gitleaks
+
+![CI run](docs/screenshots/14_github_actions_ci.png)
 
 ---
 
@@ -206,6 +221,7 @@ retail-data-platform/
 
 - **Gold is moved manually.** Databricks Free Edition cannot write directly to ADLS, so Gold is exported to a Databricks volume, downloaded, and uploaded to the `gold` container with **Azure Storage Explorer**. With Azure Databricks and a Unity Catalog external location, this step would be automated inside the pipeline.
 - **Databricks is not triggered by ADF.** Notebooks are run by hand for the same reason. In production, ADF would call Databricks as part of `pl_master_ingest`.
+- **No automated deployment (CD).** CI runs on every pull request, but ADF is published manually from ADF Studio, which writes ARM templates to the `adf_publish` branch. A release pipeline that deploys them to a production factory was not built.
 - **Full loads only.** Each run copies the full tables. Incremental loading with a watermark column would be the next improvement.
 - **Simulated data.** Volumes are small and chosen for learning, not performance testing.
 - **Power BI uses Import mode** with a manual refresh.
@@ -220,4 +236,4 @@ retail-data-platform/
 - Data quality handling: validation, rejects tables and row-count reconciliation
 - Dimensional modelling (star schema) and a serving layer on Synapse serverless
 - Power BI modelling and reporting, with a real data insight surfaced
-- Git-based workflow: feature branches, pull requests and publish
+- Git-based workflow: feature branches, pull requests, publish, and automated CI checks with GitHub Actions
