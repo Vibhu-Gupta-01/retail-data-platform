@@ -1,0 +1,17 @@
+{
+	"name": "tr_daily_master_ingest",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2026-11-26T18:48:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}
